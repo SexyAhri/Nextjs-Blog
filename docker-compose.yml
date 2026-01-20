@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  blog:
+    image: ghcr.io/你的用户名/my-blog:latest
+    container_name: vixenahri-blog
+    restart: unless-stopped
+    ports:
+      - "5177:5177"
+    environment:
+      - DATABASE_URL=postgresql://用户名:密码@数据库地址:5432/myblog
+      - NEXTAUTH_SECRET=你的密钥
+      - NEXTAUTH_URL=https://blog.vixenahri.cn
+    volumes:
+      - ./uploads:/app/public/uploads
+    healthcheck:
+      test:
+        ["CMD", "wget", "-q", "--spider", "http://localhost:5177/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - blog-network
+
+networks:
+  blog-network:
+    driver: bridge

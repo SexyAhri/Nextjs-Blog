@@ -1,0 +1,426 @@
+/* ========================================
+   后台管理样式
+   ======================================== */
+
+/* 侧边栏菜单样式 */
+.ant-menu-light .ant-menu-item-selected {
+    background-color: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+.ant-menu-light .ant-menu-item-selected::after {
+    border-right-color: #2563eb !important;
+}
+
+.ant-menu-light .ant-menu-item:hover {
+    background-color: #f8f9fa !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+    background-color: #2563eb !important;
+}
+
+/* 卡片样式 */
+.ant-card {
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.ant-card-head {
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+
+/* 表格样式 */
+.ant-table {
+    border-radius: 8px !important;
+}
+
+.ant-table-thead>tr>th {
+    background: #fafafa !important;
+    font-weight: 600 !important;
+}
+
+/* 按钮样式 */
+.ant-btn-primary {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+}
+
+.ant-btn-primary:hover {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+}
+
+/* 标签样式 */
+.ant-tag-success {
+    background: #ecfdf5 !important;
+    border-color: #a7f3d0 !important;
+    color: #059669 !important;
+}
+
+.ant-tag-warning {
+    background: #fffbeb !important;
+    border-color: #fde68a !important;
+    color: #d97706 !important;
+}
+
+/* 分页样式 */
+.ant-pagination-item-active {
+    border-color: #2563eb !important;
+}
+
+.ant-pagination-item-active a {
+    color: #2563eb !important;
+}
+
+/* 输入框聚焦样式 */
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* 选择框样式 */
+.ant-select-focused .ant-select-selector {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* 开关样式 */
+.ant-switch-checked {
+    background: #2563eb !important;
+}
+
+/* 统计卡片动画 */
+.metric-card {
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 暗色模式调整 */
+[data-theme="dark"] .ant-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .ant-table-thead>tr>th {
+    background: #1f1f1f !important;
+}
+
+[data-theme="dark"] .ant-card-head {
+    border-bottom-color: #303030 !important;
+}
+
+/* ========================================
+   TipTap 编辑器样式
+   ======================================== */
+.tiptap-editor {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.tiptap-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 12px;
+    background: #fafafa;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.tiptap-toolbar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tiptap-toolbar button:hover {
+    background: #fff;
+    border-color: #d9d9d9;
+}
+
+.tiptap-toolbar button.is-active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.tiptap-toolbar button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tiptap-toolbar .divider {
+    width: 1px;
+    height: 24px;
+    background: #e8e8e8;
+    margin: 4px 4px;
+}
+
+.tiptap-toolbar .ant-space-compact {
+    display: flex;
+}
+
+.tiptap-link-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fffbe6;
+    border-bottom: 1px solid #ffe58f;
+}
+
+.tiptap-link-input input {
+    flex: 1;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.tiptap-link-input input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+/* 编辑器内容区 */
+.tiptap-content {
+    min-height: 400px;
+    padding: 16px 20px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1a1a1a;
+}
+
+.tiptap-content:focus {
+    outline: none;
+}
+
+.tiptap-content p {
+    margin: 0 0 1em;
+}
+
+.tiptap-content h1,
+.tiptap-content h2,
+.tiptap-content h3 {
+    margin: 1.2em 0 0.6em;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.tiptap-content h1 {
+    font-size: 24px;
+}
+
+.tiptap-content h2 {
+    font-size: 20px;
+}
+
+.tiptap-content h3 {
+    font-size: 17px;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+    margin: 0.8em 0;
+    padding-left: 1.5em;
+}
+
+.tiptap-content li {
+    margin-bottom: 0.3em;
+}
+
+.tiptap-content blockquote {
+    margin: 1em 0;
+    padding: 0 0 0 16px;
+    border-left: 3px solid #2563eb;
+    color: #666;
+}
+
+.tiptap-content pre {
+    margin: 1em 0;
+    padding: 12px 16px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: "SF Mono", Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.tiptap-content code {
+    padding: 2px 6px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    font-family: "SF Mono", Monaco, monospace;
+    font-size: 0.9em;
+}
+
+.tiptap-content pre code {
+    padding: 0;
+    background: none;
+}
+
+.tiptap-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 1em 0;
+}
+
+.tiptap-content a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.tiptap-content hr {
+    margin: 1.5em 0;
+    border: none;
+    border-top: 1px solid #e8e8e8;
+}
+
+/* 编辑器占位符 */
+.tiptap-content p.is-editor-empty:first-child::before {
+    content: "开始写作...";
+    color: #aaa;
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
+
+/* ========================================
+   文章编辑页面布局
+   ======================================== */
+.post-form-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.post-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+}
+
+.post-form-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-form-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.post-form-content {
+    display: flex;
+    flex: 1;
+    gap: 0;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.post-form-main {
+    flex: 1;
+    padding: 20px 24px;
+    background: #fff;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 编辑器容器 */
+.post-form-main .tiptap-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.post-form-main .tiptap-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.post-form-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    padding: 20px;
+    background: #fafafa;
+    border-left: 1px solid #f0f0f0;
+    overflow-y: auto;
+}
+
+.post-form-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.post-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.post-form-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-form-cover {
+    position: relative;
+}
+
+.post-form-cover-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+    .post-form-content {
+        flex-direction: column;
+    }
+
+    .post-form-sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #f0f0f0;
+    }
+}
