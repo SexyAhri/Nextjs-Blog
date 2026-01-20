@@ -135,7 +135,7 @@ export function Header() {
           <Space style={{ cursor: "pointer" }}>
             <Avatar
               size={32}
-              src={user?.image || "/uploads/1768916399790-ry6r9e.jpg"}
+              src={user?.image}
               style={{ backgroundColor: "#2563eb" }}
             >
               {user?.name?.charAt(0).toUpperCase() || "V"}
