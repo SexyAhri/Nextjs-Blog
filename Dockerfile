@@ -1,7 +1,10 @@
 # 构建阶段
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
+
+# 安装 OpenSSL（Prisma 需要）
+RUN apk add --no-cache openssl
 
 # 安装依赖
 COPY package*.json ./
@@ -17,12 +20,15 @@ RUN npx prisma generate
 RUN npm run build
 
 # 生产阶段
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=5177
+
+# 安装 OpenSSL
+RUN apk add --no-cache openssl
 
 # 创建非 root 用户
 RUN addgroup --system --gid 1001 nodejs
