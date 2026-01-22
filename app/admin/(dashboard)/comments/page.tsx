@@ -103,7 +103,7 @@ export default function CommentsPage() {
       title: "文章",
       dataIndex: ["post", "title"],
       key: "post",
-      width: 200,
+      width: 240,
       ellipsis: true,
     },
     {
@@ -121,7 +121,7 @@ export default function CommentsPage() {
       title: "时间",
       dataIndex: "createdAt",
       key: "createdAt",
-      width: 160,
+      width: 180,
       render: (date: string) => new Date(date).toLocaleString("zh-CN"),
     },
     {

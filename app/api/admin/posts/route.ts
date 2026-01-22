@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateSlug } from "@/lib/utils";
 import { logOperation, getClientInfo } from "@/lib/logger";
+import { cache } from "@/lib/cache";
 
 // GET - 获取所有文章
 export async function GET(request: NextRequest) {
@@ -154,6 +155,9 @@ export async function POST(request: NextRequest) {
       ip,
       userAgent,
     });
+
+    // 清除文章列表缓存
+    cache.deletePattern("^posts:");
 
     return NextResponse.json({
       success: true,

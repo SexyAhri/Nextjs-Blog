@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cache, CACHE_TTL } from "@/lib/cache";
 
 // GET - 获取已发布的文章列表（前台）
 export async function GET(request: NextRequest) {
@@ -11,67 +12,83 @@ export async function GET(request: NextRequest) {
     const tagId = searchParams.get("tagId");
     const search = searchParams.get("search");
 
-    const skip = (page - 1) * pageSize;
+    // 生成缓存 key
+    const cacheKey = `posts:${page}:${pageSize}:${categoryId || ""}:${tagId || ""}:${search || ""}`;
 
-    // 构建查询条件
-    const where: any = {
-      published: true,
-    };
+    // 使用缓存
+    const result = await cache.cached(
+      cacheKey,
+      async () => {
+        const skip = (page - 1) * pageSize;
 
-    if (categoryId) {
-      where.categoryId = categoryId;
-    }
+        // 构建查询条件
+        const where: any = {
+          published: true,
+        };
 
-    if (tagId) {
-      where.tags = {
-        some: {
-          tagId,
-        },
-      };
-    }
+        if (categoryId) {
+          where.categoryId = categoryId;
+        }
 
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { content: { contains: search, mode: "insensitive" } },
-        { excerpt: { contains: search, mode: "insensitive" } },
-      ];
-    }
+        if (tagId) {
+          where.tags = {
+            some: {
+              tagId,
+            },
+          };
+        }
 
-    // 获取文章列表
-    const [posts, total] = await Promise.all([
-      prisma.post.findMany({
-        where,
-        include: {
-          author: {
-            select: { id: true, name: true, email: true },
-          },
-          category: {
-            select: { id: true, name: true, slug: true },
-          },
-          tags: {
+        if (search) {
+          where.OR = [
+            { title: { contains: search, mode: "insensitive" } },
+            { content: { contains: search, mode: "insensitive" } },
+            { excerpt: { contains: search, mode: "insensitive" } },
+          ];
+        }
+
+        // 获取文章列表
+        const [posts, total] = await Promise.all([
+          prisma.post.findMany({
+            where,
             include: {
-              tag: {
+              author: {
+                select: { id: true, name: true, email: true },
+              },
+              category: {
                 select: { id: true, name: true, slug: true },
               },
+              tags: {
+                include: {
+                  tag: {
+                    select: { id: true, name: true, slug: true },
+                  },
+                },
+              },
             },
-          },
-        },
-        orderBy: { publishedAt: "desc" },
-        skip,
-        take: pageSize,
-      }),
-      prisma.post.count({ where }),
-    ]);
+            orderBy: { publishedAt: "desc" },
+            skip,
+            take: pageSize,
+          }),
+          prisma.post.count({ where }),
+        ]);
 
-    return NextResponse.json({
-      success: true,
-      data: posts,
-      pagination: {
-        page,
-        pageSize,
-        total,
-        totalPages: Math.ceil(total / pageSize),
+        return {
+          success: true,
+          data: posts,
+          pagination: {
+            page,
+            pageSize,
+            total,
+            totalPages: Math.ceil(total / pageSize),
+          },
+        };
+      },
+      CACHE_TTL.SHORT // 30秒缓存
+    );
+
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
       },
     });
   } catch (error) {

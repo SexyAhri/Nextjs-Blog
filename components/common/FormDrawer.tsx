@@ -11,6 +11,7 @@ interface FormDrawerProps {
   open: boolean;
   onClose: () => void;
   onSubmit?: (values: any) => void | Promise<void>;
+  onValuesChange?: (changedValues: any, allValues: any, form: ReturnType<typeof Form.useForm>[0]) => void;
   width?: string;
   children: ReactNode;
   initialValues?: Record<string, any>;
@@ -27,6 +28,7 @@ export function FormDrawer({
   open,
   onClose,
   onSubmit,
+  onValuesChange,
   width = "50vw",
   children,
   initialValues,
@@ -88,7 +90,7 @@ export function FormDrawer({
       title={title}
       open={open}
       onClose={onClose}
-      destroyOnClose
+      forceRender
       styles={{
         wrapper: { width: isFullscreen ? "100vw" : width },
         header: {
@@ -122,6 +124,9 @@ export function FormDrawer({
         layout={formLayout}
         labelCol={labelCol}
         wrapperCol={wrapperCol}
+        onValuesChange={(changedValues, allValues) => {
+          onValuesChange?.(changedValues, allValues, form);
+        }}
         {...formProps}
       >
         <Row gutter={16}>{children}</Row>

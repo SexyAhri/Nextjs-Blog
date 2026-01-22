@@ -28,6 +28,7 @@ import {
 import PostEditor from "./PostEditor";
 import ImagePicker from "./ImagePicker";
 import PostPreview from "./PostPreview";
+import { generateSlug } from "@/lib/utils";
 import dayjs from "dayjs";
 
 const { TextArea } = Input;
@@ -260,12 +261,7 @@ export default function PostForm({ post }: PostFormProps) {
                 onChange={(e) => {
                   const title = e.target.value;
                   if (!post) {
-                    const slug = title
-                      .toLowerCase()
-                      .trim()
-                      .replace(/[\s_]+/g, "-")
-                      .replace(/[^\w\-\u4e00-\u9fa5]+/g, "")
-                      .replace(/\-\-+/g, "-");
+                    const slug = generateSlug(title);
                     form.setFieldValue("slug", slug);
                   }
                 }}

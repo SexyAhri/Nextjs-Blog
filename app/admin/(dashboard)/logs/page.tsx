@@ -105,7 +105,7 @@ export default function LogsPage() {
       title: "时间",
       dataIndex: "createdAt",
       key: "createdAt",
-      width: 160,
+      width: 180,
       render: (date: string) => new Date(date).toLocaleString("zh-CN"),
     },
     {
@@ -143,7 +143,7 @@ export default function LogsPage() {
       title: "IP",
       dataIndex: "ip",
       key: "ip",
-      width: 180,
+      width: 280,
       render: (ip: string) => ip || "-",
     },
   ];
@@ -181,7 +181,7 @@ export default function LogsPage() {
       title: "IP",
       dataIndex: "ip",
       key: "ip",
-      width: 180,
+      width: 280,
       render: (ip: string) => ip || "-",
     },
     {

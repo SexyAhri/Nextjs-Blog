@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { startScheduler } from "@/lib/scheduler";
+
+// 启动定时发布调度器
+startScheduler();
 
 export async function GET() {
   try {
@@ -10,6 +14,7 @@ export async function GET() {
       success: true,
       message: "系统运行正常",
       database: "已连接",
+      scheduler: "运行中",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

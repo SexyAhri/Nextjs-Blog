@@ -9,6 +9,7 @@ import {
   FormDrawer,
   InputItem,
 } from "@/components/common";
+import { generateSlug } from "@/lib/utils";
 
 interface TagType {
   id: string;
@@ -212,6 +213,11 @@ export default function TagsPage() {
           setEditingTag(null);
         }}
         onSubmit={handleSubmit}
+        onValuesChange={(changedValues, allValues, form) => {
+          if (changedValues.name && !editingTag) {
+            form.setFieldValue("slug", generateSlug(changedValues.name));
+          }
+        }}
         initialValues={editingTag || {}}
         loading={submitting}
       >

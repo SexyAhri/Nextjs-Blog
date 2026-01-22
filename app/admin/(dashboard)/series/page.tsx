@@ -6,6 +6,7 @@ import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { DataTable, MetricCard } from "@/components/common";
 import { Row, Col, Modal } from "antd";
 import { BookOutlined } from "@ant-design/icons";
+import { generateSlug } from "@/lib/utils";
 
 const { TextArea } = Input;
 
@@ -231,11 +232,7 @@ export default function SeriesPage() {
               placeholder="如：React 入门教程"
               onChange={(e) => {
                 if (!editingSeries) {
-                  const slug = e.target.value
-                    .toLowerCase()
-                    .trim()
-                    .replace(/[\s_]+/g, "-")
-                    .replace(/[^\w\-\u4e00-\u9fa5]+/g, "");
+                  const slug = generateSlug(e.target.value);
                   form.setFieldValue("slug", slug);
                 }
               }}

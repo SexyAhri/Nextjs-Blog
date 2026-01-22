@@ -14,6 +14,7 @@ import {
   InputItem,
   TextAreaItem,
 } from "@/components/common";
+import { generateSlug } from "@/lib/utils";
 
 interface Category {
   id: string;
@@ -225,6 +226,11 @@ export default function CategoriesPage() {
           setEditingCategory(null);
         }}
         onSubmit={handleSubmit}
+        onValuesChange={(changedValues, allValues, form) => {
+          if (changedValues.name && !editingCategory) {
+            form.setFieldValue("slug", generateSlug(changedValues.name));
+          }
+        }}
         initialValues={editingCategory || {}}
         loading={submitting}
       >

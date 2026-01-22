@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateSlug } from "@/lib/utils";
 import { logOperation, getClientInfo } from "@/lib/logger";
+import { cache } from "@/lib/cache";
 
 // GET - 获取单篇文章
 export async function GET(
@@ -176,6 +177,10 @@ export async function PUT(
       userAgent,
     });
 
+    // 清除缓存
+    cache.deletePattern("^posts:");
+    cache.delete(`post:${post.slug}`);
+
     return NextResponse.json({
       success: true,
       data: post,
@@ -209,10 +214,10 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // 获取文章信息用于日志
+    // 获取文章信息用于日志和缓存清除
     const post = await prisma.post.findUnique({
       where: { id },
-      select: { title: true },
+      select: { title: true, slug: true },
     });
 
     await prisma.post.delete({
@@ -231,6 +236,12 @@ export async function DELETE(
       ip,
       userAgent,
     });
+
+    // 清除缓存
+    cache.deletePattern("^posts:");
+    if (post?.slug) {
+      cache.delete(`post:${post.slug}`);
+    }
 
     return NextResponse.json({
       success: true,
