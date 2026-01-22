@@ -17,7 +17,27 @@ import {
   TwitterOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
-import { marked } from "marked";
+import { marked, Renderer } from "marked";
+
+// 配置 marked
+const renderer = new Renderer();
+// 禁止代码块内的链接被解析
+renderer.code = function({ text, lang }: { text: string; lang?: string; escaped?: boolean }) {
+  const language = lang || '';
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+  return `<pre><code class="language-${language}">${escaped}</code></pre>`;
+};
+
+marked.setOptions({
+  renderer,
+  gfm: true,
+  breaks: true,
+});
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
 import "prismjs/components/prism-javascript";
@@ -179,13 +199,12 @@ export default function PostContent({ slug }: { slug: string }) {
 
   const handleLike = async () => {
     if (!post) return;
-    const visitorId = getVisitorId();
 
     try {
       const res = await fetch(`/api/posts/${slug}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visitorId }),
+        body: JSON.stringify({ visitorId: getVisitorId() }),
       });
       const data = await res.json();
       if (data.success) {
@@ -242,13 +261,47 @@ export default function PostContent({ slug }: { slug: string }) {
     if (!post?.content) return { renderedContent: "", toc: [] };
 
     const tocItems: TocItem[] = [];
-    const isHtml =
-      /<[a-z][\s\S]*>/i.test(post.content) &&
-      (post.content.includes("<p>") ||
-        post.content.includes("<h") ||
-        post.content.includes("<div"));
-
-    let html = isHtml ? post.content : (marked(post.content) as string);
+    
+    // 检查内容是否是被 <p> 包裹的 Markdown
+    // TipTap 编辑器粘贴纯文本时会把每行包在 <p> 里
+    // 例如: <p># 标题</p><p>内容</p>
+    let content = post.content;
+    
+    // 如果内容被 <p> 包裹，且 <p> 内部以 # 开头或包含 ```，说明是 Markdown 被错误包裹了
+    const isWrappedMarkdown = /<p>\s*#{1,6}\s/i.test(content) || /<p>\s*```/.test(content) || /<p>\s*-\s/.test(content);
+    
+    if (isWrappedMarkdown) {
+      // 移除 <p> 标签，还原成纯 Markdown
+      content = content
+        .replace(/<p>/gi, '')
+        .replace(/<\/p>/gi, '\n')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .trim();
+    }
+    
+    // 清理代码块内被 TipTap 自动转换的链接
+    // 匹配 ``` 代码块内的 <a> 标签，还原成纯文本
+    content = content.replace(/```([\s\S]*?)```/g, (match, code) => {
+      // 把 <a href="...">text</a> 还原成 text
+      const cleanCode = code.replace(/<a[^>]*>([^<]*)<\/a>/gi, '$1');
+      return '```' + cleanCode + '```';
+    });
+    
+    // 判断是否需要用 marked 解析
+    const hasRealHtmlStructure = /<(h[1-6]|ul|ol|blockquote|pre|table)[^>]*>/i.test(content);
+    const looksLikeMarkdown = /^#{1,6}\s/m.test(content) || /```[\s\S]*?```/.test(content);
+    
+    const shouldParseAsMarkdown = looksLikeMarkdown && !hasRealHtmlStructure;
+    
+    let html = shouldParseAsMarkdown ? (marked(content) as string) : content;
+    
+    // 如果不是 Markdown，也要清理 <pre><code> 内的链接
+    if (!shouldParseAsMarkdown) {
+      html = html.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, (match, code) => {
+        const cleanCode = code.replace(/<a[^>]*>([^<]*)<\/a>/gi, '$1');
+        return match.replace(code, cleanCode);
+      });
+    }
 
     let headingIndex = 0;
     html = html.replace(/<h([1-3])>(.*?)<\/h\1>/gi, (_, level, text) => {
