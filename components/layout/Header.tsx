@@ -28,7 +28,7 @@ export function Header() {
   const router = useRouter();
   const { themeMode, setThemeMode } = useTheme();
   const { token } = theme.useToken();
-  const switchRef = useRef<HTMLElement>(null);
+  const switchRef = useRef<HTMLSpanElement>(null);
   const { data: session } = useSession();
   const { message, modal } = App.useApp();
 
@@ -71,9 +71,77 @@ export function Header() {
     }));
   };
 
-  const handleThemeChange = async (checked: boolean) => {
+  // 创建涟漪效果（与前台一致）
+  const createRipple = (x: number, y: number, toLight: boolean) => {
+    const rippleContainer = document.createElement("div");
+    rippleContainer.className = "theme-ripple-container";
+    rippleContainer.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99999;
+      overflow: hidden;
+    `;
+
+    const rippleColor = toLight
+      ? "rgba(79, 110, 247, 0.6)"
+      : "rgba(255, 255, 255, 0.5)";
+
+    for (let i = 0; i < 3; i++) {
+      const ripple = document.createElement("div");
+      ripple.className = "theme-ripple";
+      ripple.style.cssText = `
+        position: absolute;
+        left: ${x}px;
+        top: ${y}px;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        border: 3px solid ${rippleColor};
+        box-shadow: 0 0 10px ${rippleColor};
+        animation: ripple-wave 0.8s ease-out forwards;
+        animation-delay: ${i * 0.12}s;
+      `;
+      rippleContainer.appendChild(ripple);
+    }
+
+    document.body.appendChild(rippleContainer);
+    setTimeout(() => rippleContainer.remove(), 1200);
+  };
+
+  // 圆形扩散切换主题（与前台一致）
+  const handleThemeChange = (checked: boolean) => {
     const newTheme = checked ? "dark" : "light";
-    setThemeMode(newTheme);
+    const toLight = !checked;
+
+    const switchEl = switchRef.current;
+    const rect = switchEl?.getBoundingClientRect();
+    const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const y = rect ? rect.top + rect.height / 2 : 0;
+
+    createRipple(x, y, toLight);
+
+    if (!document.startViewTransition) {
+      setThemeMode(newTheme);
+      return;
+    }
+
+    const maxRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    document.documentElement.style.setProperty("--theme-x", `${x}px`);
+    document.documentElement.style.setProperty("--theme-y", `${y}px`);
+    document.documentElement.style.setProperty("--theme-r", `${maxRadius}px`);
+
+    document.startViewTransition(() => {
+      setThemeMode(newTheme);
+    });
   };
 
   const handleMenuClick = ({ key }: { key: string }) => {
