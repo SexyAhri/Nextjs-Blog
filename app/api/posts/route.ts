@@ -11,9 +11,10 @@ export async function GET(request: NextRequest) {
     const categoryId = searchParams.get("categoryId");
     const tagId = searchParams.get("tagId");
     const search = searchParams.get("search");
+    const sort = searchParams.get("sort") || "latest"; // latest | hot | liked
 
     // 生成缓存 key
-    const cacheKey = `posts:${page}:${pageSize}:${categoryId || ""}:${tagId || ""}:${search || ""}`;
+    const cacheKey = `posts:${page}:${pageSize}:${categoryId || ""}:${tagId || ""}:${search || ""}:${sort}`;
 
     // 使用缓存
     const result = await cache.cached(
@@ -46,10 +47,18 @@ export async function GET(request: NextRequest) {
           ];
         }
 
+        const orderBy =
+          sort === "hot"
+            ? [{ viewCount: "desc" as const }, { publishedAt: "desc" as const }]
+            : sort === "liked"
+              ? [{ likeCount: "desc" as const }, { publishedAt: "desc" as const }]
+              : { publishedAt: "desc" as const };
+
         // 获取文章列表
         const [posts, total] = await Promise.all([
           prisma.post.findMany({
             where,
+            orderBy,
             include: {
               author: {
                 select: { id: true, name: true, email: true },
@@ -65,7 +74,6 @@ export async function GET(request: NextRequest) {
                 },
               },
             },
-            orderBy: { publishedAt: "desc" },
             skip,
             take: pageSize,
           }),

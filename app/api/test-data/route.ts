@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // 查询数据库中的数据
     const [userCount, postCount, categoryCount, tagCount] = await Promise.all([
       prisma.user.count(),
       prisma.post.count(),

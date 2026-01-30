@@ -104,6 +104,20 @@ NEXT_PUBLIC_SITE_URL="https://your-domain.com"
 CRON_SECRET="your-cron-secret"
 ```
 
+### 图片优化
+
+使用 Next.js `Image` 组件自动优化：
+- 文章封面、相关文章、侧边栏头像
+- 图片懒加载、响应式 `sizes`
+- 点击放大模态框
+
+### API 限流
+
+- **评论提交**：每 IP 每分钟最多 5 次
+- **搜索**：每 IP 每分钟最多 30 次
+
+超限返回 429，提示「操作过于频繁，请稍后再试」。
+
 ## Docker 部署
 
 ### 使用 Docker Compose
@@ -147,6 +161,34 @@ docker compose up -d
 docker exec -it vixenahri-blog npx prisma db push
 docker exec -it vixenahri-blog npx prisma db seed
 ```
+
+## 数据库表说明
+
+### Setting 表（键值对配置）
+
+| key | 说明 | 示例 |
+|-----|------|------|
+| siteName | 网站名称 | 我的博客 |
+| siteDescription | 网站描述 | 一个基于 Next.js 的个人博客 |
+| siteKeywords | 网站关键词 | 博客,技术,分享 |
+| siteUrl | 网站地址 | https://example.com |
+| siteAuthor | 网站作者 | VixenAhri |
+| siteEmail | 联系邮箱 | admin@example.com |
+| siteIcp | ICP 备案号 | 京ICP备xxx号 |
+| siteMotto | 个人格言（侧边栏简介卡片） | 记录与分享，让技术更有温度 |
+| siteAvatar | 头像 URL（侧边栏简介卡片） | /uploads/avatar.jpg |
+| siteProfileBanner | 个人简介背景图（侧边栏卡片顶部） | /uploads/banner.jpg |
+| siteAnalytics | 统计代码 | Google Analytics 脚本 |
+| postsPerPage | 每页文章数 | 10 |
+| enableComments | 启用评论 | true / false |
+| enableRss | 启用 RSS | true / false |
+| enableSitemap | 启用 Sitemap | true / false |
+| socialGithub | GitHub 链接 | https://github.com/xxx |
+| socialTwitter | Twitter 链接 | |
+| socialWeibo | 微博链接 | |
+| socialEmail | 社交邮箱 | |
+
+**个人简介卡片**（`/api/settings/profile`）使用：`siteUrl`、`siteMotto`、`siteAvatar`。`postCount`、`commentCount` 由 Post、Comment 表统计。
 
 ## 项目结构
 

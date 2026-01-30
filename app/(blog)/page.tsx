@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Pagination, Spin, Empty } from "antd";
 import PostCard from "@/components/blog/PostCard";
 import BlogSidebar from "@/components/blog/BlogSidebar";
+import { FireOutlined, ThunderboltOutlined } from "@ant-design/icons";
 
 interface Post {
   id: string;
@@ -13,6 +14,7 @@ interface Post {
   coverImage?: string;
   publishedAt: string;
   viewCount: number;
+  likeCount?: number;
   author: {
     name: string;
   };
@@ -28,15 +30,17 @@ interface Post {
   }>;
 }
 
+type SortType = "latest" | "hot" | "liked";
+
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [sort, setSort] = useState<SortType>("latest");
 
   useEffect(() => {
-    // 加载每页文章数设置
     fetch("/api/settings/display")
       .then((res) => res.json())
       .then((data) => {
@@ -49,12 +53,14 @@ export default function HomePage() {
 
   useEffect(() => {
     loadPosts();
-  }, [page, pageSize]);
+  }, [page, pageSize, sort]);
 
   const loadPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/posts?page=${page}&pageSize=${pageSize}`);
+      const res = await fetch(
+        `/api/posts?page=${page}&pageSize=${pageSize}&sort=${sort}`
+      );
       const data = await res.json();
       if (data.success) {
         setPosts(data.data);
@@ -67,24 +73,48 @@ export default function HomePage() {
     }
   };
 
+  const sortTabs = [
+    { key: "latest" as SortType, label: "最新文章", icon: null },
+    { key: "hot" as SortType, label: "热门文章", icon: <FireOutlined /> },
+    { key: "liked" as SortType, label: "点赞最多", icon: <ThunderboltOutlined /> },
+  ];
+
   return (
     <div className="blog-container">
-      <div className="blog-content">
-        {/* Posts */}
+      <div className="blog-content-inner">
         <div className="blog-posts">
+          {/* 文章筛选标签 */}
+          <div className="article-tabs">
+            {sortTabs.map((tab) => (
+              <button
+                key={tab.key}
+                className={`article-tab ${sort === tab.key ? "active" : ""}`}
+                onClick={() => {
+                  setSort(tab.key);
+                  setPage(1);
+                }}
+              >
+                {tab.icon && <span className="article-tab-icon">{tab.icon}</span>}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* 文章列表 */}
           {loading ? (
-            <div style={{ textAlign: "center", padding: 80 }}>
+            <div className="article-loading">
               <Spin size="large" />
             </div>
           ) : posts.length === 0 ? (
             <Empty description="暂无文章" />
           ) : (
             <>
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
+              <div className="article-list">
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} variant="standard" />
+                ))}
+              </div>
 
-              {/* Pagination */}
               {total > pageSize && (
                 <div className="blog-pagination">
                   <Pagination
@@ -99,12 +129,10 @@ export default function HomePage() {
             </>
           )}
         </div>
-
-        {/* Sidebar */}
-        <aside className="blog-aside">
-          <BlogSidebar />
-        </aside>
       </div>
+      <aside className="blog-aside">
+        <BlogSidebar />
+      </aside>
     </div>
   );
 }

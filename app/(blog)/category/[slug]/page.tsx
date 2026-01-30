@@ -89,7 +89,7 @@ export default function CategoryPage() {
 
   return (
     <div className="blog-container">
-      <div className="blog-content">
+      <div className="blog-content-inner">
         <div className="blog-posts">
           {/* Category Header */}
           <div className="category-header">
@@ -125,11 +125,10 @@ export default function CategoryPage() {
             </>
           )}
         </div>
-
-        <aside className="blog-aside">
-          <BlogSidebar />
-        </aside>
       </div>
+      <aside className="blog-aside">
+        <BlogSidebar />
+      </aside>
     </div>
   );
 }

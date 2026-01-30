@@ -12,7 +12,7 @@ const SITE_URL = "https://blog.vixenahri.cn";
 // 生成动态 SEO 元数据
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  
+
   const post = await prisma.post.findUnique({
     where: { slug, published: true },
     select: {
@@ -33,8 +33,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const keywords = post.tags?.map((t) => t.tag.name).join(", ") || "";
   const canonicalUrl = `${SITE_URL}/posts/${slug}`;
-  const coverImageUrl = post.coverImage 
-    ? (post.coverImage.startsWith("http") ? post.coverImage : `${SITE_URL}${post.coverImage}`)
+  const cover: string | null = post.coverImage ?? null;
+  const coverImageUrl = cover
+    ? (cover.startsWith("http") ? cover : `${SITE_URL}${cover}`)
     : `${SITE_URL}/og-default.png`;
 
   return {
@@ -100,8 +101,9 @@ export default async function PostPage({ params }: Props) {
   });
 
   // JSON-LD 结构化数据
-  const coverImageUrl = post.coverImage 
-    ? (post.coverImage.startsWith("http") ? post.coverImage : `${SITE_URL}${post.coverImage}`)
+  const cover: string | null = post.coverImage ?? null;
+  const coverImageUrl = cover
+    ? (cover.startsWith("http") ? cover : `${SITE_URL}${cover}`)
     : `${SITE_URL}/og-default.png`;
 
   const jsonLd = {

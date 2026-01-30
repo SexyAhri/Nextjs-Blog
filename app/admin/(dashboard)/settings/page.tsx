@@ -11,8 +11,10 @@ import {
   Tabs,
   Switch,
   InputNumber,
+  Image,
 } from "antd";
-import { SaveOutlined } from "@ant-design/icons";
+import { SaveOutlined, PictureOutlined } from "@ant-design/icons";
+import ImagePicker from "@/components/admin/ImagePicker";
 
 const { TextArea } = Input;
 
@@ -21,6 +23,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
+  const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
   const { message } = App.useApp();
 
   useEffect(() => {
@@ -51,6 +55,9 @@ export default function SettingsPage() {
           socialTwitter: data.data.socialTwitter || "",
           socialWeibo: data.data.socialWeibo || "",
           socialEmail: data.data.socialEmail || "",
+          siteProfileBanner: data.data.siteProfileBanner || "",
+          siteMotto: data.data.siteMotto || "记录与分享，让技术更有温度",
+          siteAvatar: data.data.siteAvatar || "",
         });
       }
     } catch (error) {
@@ -122,6 +129,7 @@ export default function SettingsPage() {
           onChange={setActiveTab}
           items={[
             { key: "basic", label: "基本设置" },
+            { key: "profile", label: "个人简介" },
             { key: "seo", label: "SEO 设置" },
             { key: "display", label: "显示设置" },
             { key: "social", label: "社交媒体" },
@@ -168,6 +176,116 @@ export default function SettingsPage() {
           <Form.Item label="ICP 备案号" name="siteIcp">
             <Input placeholder="请输入 ICP 备案号" />
           </Form.Item>
+        </Card>
+
+        {/* 个人简介 */}
+        <Card style={{ display: activeTab === "profile" ? "block" : "none" }}>
+          <Form.Item
+            label="侧边栏背景图"
+            name="siteProfileBanner"
+            help="个人简介卡片顶部背景图，建议尺寸 400×120 左右"
+          >
+            <Input
+              placeholder="点击选择或输入图片地址"
+              addonAfter={
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<PictureOutlined />}
+                  onClick={() => setBannerPickerOpen(true)}
+                >
+                  选择
+                </Button>
+              }
+            />
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prev, curr) => prev.siteProfileBanner !== curr.siteProfileBanner}
+          >
+            {({ getFieldValue }) => {
+              const banner = getFieldValue("siteProfileBanner");
+              if (!banner) return null;
+              return (
+                <div style={{ marginBottom: 16 }}>
+                  <Image
+                    src={banner}
+                    alt="背景预览"
+                    style={{ maxWidth: 300, maxHeight: 90, objectFit: "cover", borderRadius: 8 }}
+                  />
+                </div>
+              );
+            }}
+          </Form.Item>
+          <Form.Item
+            label="个人格言"
+            name="siteMotto"
+            help="显示在侧边栏个人简介卡片中"
+          >
+            <TextArea
+              rows={2}
+              placeholder="记录与分享，让技术更有温度"
+              maxLength={100}
+              showCount
+            />
+          </Form.Item>
+          <Form.Item
+            label="个人头像"
+            name="siteAvatar"
+            help="个人简介卡片头像，建议正方形图片"
+          >
+            <Input
+              placeholder="点击选择或输入图片地址"
+              addonAfter={
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<PictureOutlined />}
+                  onClick={() => setAvatarPickerOpen(true)}
+                >
+                  选择
+                </Button>
+              }
+            />
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prev, curr) => prev.siteAvatar !== curr.siteAvatar}
+          >
+            {({ getFieldValue }) => {
+              const avatar = getFieldValue("siteAvatar");
+              if (!avatar) return null;
+              return (
+                <div style={{ marginBottom: 16 }}>
+                  <Image
+                    src={avatar}
+                    alt="头像预览"
+                    width={80}
+                    height={80}
+                    style={{ borderRadius: "50%", objectFit: "cover" }}
+                  />
+                </div>
+              );
+            }}
+          </Form.Item>
+          <ImagePicker
+            open={bannerPickerOpen}
+            onClose={() => setBannerPickerOpen(false)}
+            onSelect={(filepath) => {
+              form.setFieldValue("siteProfileBanner", filepath);
+              setBannerPickerOpen(false);
+            }}
+            value={form.getFieldValue("siteProfileBanner")}
+          />
+          <ImagePicker
+            open={avatarPickerOpen}
+            onClose={() => setAvatarPickerOpen(false)}
+            onSelect={(filepath) => {
+              form.setFieldValue("siteAvatar", filepath);
+              setAvatarPickerOpen(false);
+            }}
+            value={form.getFieldValue("siteAvatar")}
+          />
         </Card>
 
         {/* SEO 设置 */}

@@ -7,7 +7,8 @@ export async function POST(
 ) {
   try {
     const { slug } = await params;
-    const { visitorId } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const visitorId = body.visitorId;
 
     if (!visitorId) {
       return NextResponse.json(

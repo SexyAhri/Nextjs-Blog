@@ -3,19 +3,31 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Input } from "antd";
-import { SearchOutlined, MenuOutlined, CloseOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  MenuOutlined,
+  CloseOutlined,
+  SunOutlined,
+  MoonOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/app/providers";
 
 export default function BlogHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
+  const { themeMode, setThemeMode } = useTheme();
 
   const handleSearch = () => {
     if (searchValue.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchValue)}`);
       setSearchValue("");
     }
+  };
+
+  const toggleTheme = () => {
+    setThemeMode(themeMode === "light" ? "dark" : "light");
   };
 
   const menuItems = [
@@ -42,16 +54,24 @@ export default function BlogHeader() {
           ))}
         </nav>
 
-        {/* Search */}
-        <div className="blog-search">
-          <Input
-            placeholder="搜索..."
-            prefix={<SearchOutlined style={{ color: "#999" }} />}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onPressEnter={handleSearch}
-            style={{ width: 180 }}
-          />
+        {/* Search & Theme Toggle */}
+        <div className="blog-header-actions">
+          <div className="blog-search">
+            <Input
+              placeholder="搜索文章..."
+              prefix={<SearchOutlined style={{ color: "var(--blog-text-muted)" }} />}
+              value={searchValue}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
+              onPressEnter={handleSearch}
+            />
+          </div>
+          <button
+            className="blog-theme-toggle"
+            onClick={toggleTheme}
+            aria-label={themeMode === "light" ? "切换到暗色模式" : "切换到亮色模式"}
+          >
+            {themeMode === "light" ? <MoonOutlined /> : <SunOutlined />}
+          </button>
         </div>
 
         {/* Mobile Menu Button */}

@@ -19,9 +19,12 @@ import {
 } from "@ant-design/icons";
 import { marked, Renderer } from "marked";
 
+// 复制按钮 SVG
+const copyIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+
 // 配置 marked
 const renderer = new Renderer();
-// 禁止代码块内的链接被解析
+// 代码块：macOS 风格头部 + 复制按钮
 renderer.code = function({ text, lang }: { text: string; lang?: string; escaped?: boolean }) {
   const language = lang || '';
   const escaped = text
@@ -30,7 +33,17 @@ renderer.code = function({ text, lang }: { text: string; lang?: string; escaped?
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-  return `<pre><code class="language-${language}">${escaped}</code></pre>`;
+  return `<div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-dots">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+      </span>
+      <button class="code-block-copy" type="button" title="复制代码" aria-label="复制代码">${copyIconSvg}</button>
+    </div>
+    <pre><code class="language-${language}">${escaped}</code></pre>
+  </div>`;
 };
 
 marked.setOptions({
@@ -39,7 +52,7 @@ marked.setOptions({
   breaks: true,
 });
 import Prism from "prismjs";
-import "prismjs/themes/prism-tomorrow.css";
+import "prismjs/themes/prism.css";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-jsx";
@@ -132,6 +145,25 @@ export default function PostContent({ slug }: { slug: string }) {
       Prism.highlightAll();
     }
   }, [post?.content]);
+
+  // 代码块复制按钮
+  useEffect(() => {
+    const handleCopy = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest('.code-block-copy');
+      if (!target) return;
+      const wrapper = (target as HTMLElement).closest('.code-block-wrapper');
+      if (!wrapper) return;
+      const codeEl = wrapper.querySelector('pre code') || wrapper.querySelector('pre');
+      const text = codeEl?.textContent || '';
+      navigator.clipboard.writeText(text).then(() => {
+        message.success('已复制到剪贴板');
+      }).catch(() => {
+        message.error('复制失败');
+      });
+    };
+    document.addEventListener('click', handleCopy);
+    return () => document.removeEventListener('click', handleCopy);
+  }, [message]);
 
   // 检查是否已点赞
   useEffect(() => {
@@ -313,6 +345,23 @@ export default function PostContent({ slug }: { slug: string }) {
 
     // 给图片添加懒加载
     html = html.replace(/<img /g, '<img loading="lazy" ');
+
+    // TipTap 等输出的 HTML 中，包装裸的 pre 块
+    if (!shouldParseAsMarkdown) {
+      html = html.replace(/<pre([^>]*)>([\s\S]*?)<\/pre>/gi, (_, preAttrs, codeContent) => {
+        return `<div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span class="code-block-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </span>
+            <button class="code-block-copy" type="button" title="复制代码" aria-label="复制代码">${copyIconSvg}</button>
+          </div>
+          <pre${preAttrs}>${codeContent}</pre>
+        </div>`;
+      });
+    }
 
     return { renderedContent: html, toc: tocItems };
   }, [post?.content]);
@@ -545,12 +594,21 @@ export default function PostContent({ slug }: { slug: string }) {
       )}
 
       {/* 图片放大模态框 */}
-      {imageModalVisible && (
+      {imageModalVisible && currentImage && (
         <div
           className="image-modal"
           onClick={() => setImageModalVisible(false)}
         >
-          <img src={currentImage} alt="放大图片" />
+          <div style={{ position: "relative", width: "100%", height: "100%", minHeight: 200 }}>
+            <Image
+              src={currentImage}
+              alt="放大图片"
+              fill
+              sizes="100vw"
+              style={{ objectFit: "contain" }}
+              unoptimized={currentImage.startsWith("data:")}
+            />
+          </div>
         </div>
       )}
     </div>

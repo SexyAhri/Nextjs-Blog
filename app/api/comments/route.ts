@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendNewCommentNotification } from "@/lib/email";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 // GET - 获取文章评论
 export async function GET(request: NextRequest) {
@@ -54,6 +55,15 @@ export async function GET(request: NextRequest) {
 // POST - 提交评论
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const limit = rateLimit(`comment:${ip}`, { window: 60, max: 5 });
+    if (!limit.success) {
+      return NextResponse.json(
+        { success: false, error: "操作过于频繁，请稍后再试" },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { postId, slug, author, email, website, content, parentId } = body;
 
